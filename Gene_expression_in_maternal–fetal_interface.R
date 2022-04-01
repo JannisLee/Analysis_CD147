@@ -2,15 +2,17 @@ rm(list = ls())
 
 #please download data from https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-6701/E-MTAB-6701.processed.1.zip and https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-6701/E-MTAB-6701.processed.1.zip
 #then uncompress to get the files mentioned below
+#R version 4.1.0
 
 setwd('~/project/Single/')
 exprSet = read.table('~/project/Single/raw_data_10x.txt',stringsAsFactors = F,header = T,
                     row.names = 1)
 meta <- read.table('meta_10x.txt',header = T,sep = '\t',fill = T ,quote = "",
                    na.strings = "NA", comment.char = "",stringsAsFactors = F,check.names = F)
-library(dplyr)
-library(Seurat)
-library(patchwork)
+
+library(dplyr) #version 1.0.7
+library(Seurat) #version 4.0.6
+library(patchwork) #version 1.1.1
 exprSet = as.data.frame(na.omit(exprSet[which(rowSums(exprSet) > 0),]))
 fminter <- CreateSeuratObject(counts = exprSet, project = "fminter", 
                               min.cells = 3, min.features = 200)
@@ -39,12 +41,12 @@ fminter <- RunPCA(fminter)
 #UMAP
 fminter <- RunUMAP(fminter, dims = 1:40, reduction = "pca")
 
-library(ggplot2)
+library(ggplot2) #version 3.3.5
 png('Celltypes.png',width = 1600, height = 900)
 DimPlot(fminter, reduction = "umap", label = T,group.by = 'annotation')
 dev.off()
 
-library(stringr)
+library(stringr) #version 1.4.0
 oldname <- unlist(fminter@assays$RNA@counts@Dimnames[1])
 newname <- str_sub(oldname,end = nchar(oldname)-16)
 fminter@assays$RNA@counts@Dimnames[[1]] <- newname
